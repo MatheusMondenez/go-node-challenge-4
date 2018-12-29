@@ -1,6 +1,7 @@
 'use strict'
 
 const User = use('App/Models/User')
+const Hash = use('Hash')
 
 class UserController {
   async store ({ request }) {
@@ -11,12 +12,26 @@ class UserController {
   }
 
   async update ({ params, request, response }) {
-    const user = User.findOrFail(params.id)
-    const data = request.only(['username', 'email', 'password'])
+    const user = await User.findOrFail(params.id)
+    const data = request.only(['username', 'password', 'new_password'])
+    const passwordCheck = await Hash.verify(data.password, user.password)
 
-    // Pode alterar nome e senha passando a nova senha e a confirmação da nova senha
+    if (!passwordCheck) {
+      return response.status(500).send({
+        error: {
+          message: 'Invalid password'
+        }
+      })
+    }
 
-    user.merge(data)
+    if (data.username) {
+      user.username = data.username
+    }
+
+    if (data.new_password) {
+      user.password = data.new_password
+    }
+
     await user.save()
 
     return user
