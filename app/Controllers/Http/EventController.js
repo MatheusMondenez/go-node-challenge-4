@@ -5,6 +5,7 @@ const moment = require('moment')
 
 class EventController {
   async index ({ request, response, view, auth }) {
+    const { date } = request.get()
     const { page } = request.get()
     const events = await Event.query()
       .where('user_id', auth.user.id)
@@ -17,7 +18,6 @@ class EventController {
   async store ({ request, response, auth }) {
     const data = request.only(['title', 'location', 'date'])
     const event = await Event.create({ ...data, user_id: auth.user.id })
-    const { date } = request.get()
 
     return event
   }
