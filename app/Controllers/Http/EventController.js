@@ -33,20 +33,20 @@ class EventController {
   async update ({ params, request, response }) {
     const event = await Event.findOrFail(params.id)
     const data = request.only(['title', 'location', 'date'])
-    // const date = moment(data.date)
+    const date = moment(event.date)
 
-    // if (date.isBefore()) {
-    //   return response.status(5000).send({
-    //     error: {
-    //       message: 'Este evento não pode ser alterado, pois já passou'
-    //     }
-    //   })
-    // }
+    if (date.isBefore()) {
+      return response.status(5000).send({
+        error: {
+          message: 'Este evento não pode ser alterado, pois já passou'
+        }
+      })
+    }
 
-    event.merge(data)
-    await event.save()
+    // event.merge(data)
+    // await event.save()
 
-    return event
+    // return event
   }
 
   async destroy ({ params, request, response }) {
