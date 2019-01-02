@@ -5,10 +5,10 @@ const moment = require('moment')
 
 class EventController {
   async index ({ request, response, view, auth }) {
-    const { date } = request.get()
-    const { page } = request.get()
+    const { date, page } = request.get()
     const events = await Event.query()
       .where('user_id', auth.user.id)
+      // .andWhere('DATE_FORMAT(date, "%Y-%m-%d")', date)
       .with('user')
       .paginate(page)
 
