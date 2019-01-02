@@ -22,7 +22,7 @@ class EventController {
     return event
   }
 
-  async show ({ params, request, response, view }) {
+  async show ({ params }) {
     const event = await Event.findOrFail(params.id)
 
     await event.load('user')
@@ -33,15 +33,14 @@ class EventController {
   async update ({ params, request, response }) {
     const event = await Event.findOrFail(params.id)
     const data = request.only(['title', 'location', 'date'])
-    // const date = moment(data.date)
 
-    // if (date.isBefore()) {
-    //   return response.status(5000).send({
-    //     error: {
-    //       message: 'Este evento não pode ser alterado, pois já passou'
-    //     }
-    //   })
-    // }
+    if (moment(event.date).isBefore()) {
+      return response.status(500).send({
+        error: {
+          message: 'Este evento não pode ser alterado, pois já passou'
+        }
+      })
+    }
 
     event.merge(data)
     await event.save()
@@ -51,15 +50,14 @@ class EventController {
 
   async destroy ({ params, request, response }) {
     const event = await Event.findOrFail(params.id)
-    // const date = moment(data.date)
-
-    // if (date.isBefore()) {
-    //   return response.status(5000).send({
-    //     error: {
-    //       message: 'Este evento não pode ser apagado, pois já passou'
-    //     }
-    //   })
-    // }
+    
+    if (moment(event.date).isBefore()) {
+      return response.status(500).send({
+        error: {
+          message: 'Este evento não pode ser removido, pois já passou'
+        }
+      })
+    }
 
     await event.delete()
   }
